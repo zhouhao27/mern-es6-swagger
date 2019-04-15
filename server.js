@@ -58,6 +58,20 @@ app.use(logger('dev'))
 // so use the limit option
 app.use(bodyParser.json({'limit':'100kb'}))
 
+// setup database
+import { MongoClient } from 'mongodb'
+
+let db = {}
+app.set('uri', process.env.MONGODB_CONNECT_URL)
+
+const client = new MongoClient(app.get('uri'), { useNewUrlParser: true })
+db.client = client
+client.connect(err => {
+  assert.equal(null,err)
+  db.collection = db.client.db("newswatcherdb").collection("newswatcher")
+  console.log("Connected to MongoDB server")
+})
+
 // routes
 app.get('/', (req,res) => {
   console.log("Home")
@@ -109,26 +123,13 @@ app.use((err,req,res,next) => {
   console.error(err)
 })
 
-// setup database
-const MongoClient = require('mongodb').MongoClient;
-
-let db = {}
-app.set('uri', process.env.MONGODB_CONNECT_URL)
-
-const client = new MongoClient(app.get('uri'), { useNewUrlParser: true })
-db.client = client
-client.connect(err => {
-  assert.equal(null,err)
-  db.collection = db.client.db("newswatcherdb").collection("newswatcher")
-  // console.log(db.collection)
-});
-
 app.set('port', process.env.PORT)
 
 const server = app.listen(app.get('port'), () => {
-  console.log('Express server listening on port ' + server.address().port)
+  console.log(`Express server listening on port ${server.address().port}`)
 })
 
-server.db = db
-server.node2 = node2
-module.exports = server
+app.db = db
+// server.db = db
+// server.node2 = node2
+// module.exports = server

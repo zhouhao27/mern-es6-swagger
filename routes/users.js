@@ -69,7 +69,7 @@ router.get('/', (req, res) => {
  *          description: "Email account already registered."
  *        406:
  *          description: "Validation error"
- *        200:
+ *        201:
  *          description: "successful operation"
  */
 router.post('/', (req, res, next) => {
@@ -88,7 +88,7 @@ router.post('/', (req, res, next) => {
     }  
   })
 
-  req.db.collection.findOne({
+  req.app.db.collection.findOne({
     type:'USER_TYPE',
     email:req.body.email
   }, (err, doc) => {
@@ -132,15 +132,16 @@ router.post('/', (req, res, next) => {
       }
 
       xferUser.passwordHash = hash
-      req.body.collection.insertOne(xferUser, (err, result) => {
+      req.app.db.collection.insertOne(xferUser, (err, result) => {
         if (err) {
           return next(err)
         }
 
-        req.node2.send({
-          msg: 'REFERSH_STORIES',
-          doc: result.ops[0]
-        })
+        // TODO:
+        // req.node2.send({
+        //   msg: 'REFERSH_STORIES',
+        //   doc: result.ops[0]
+        // })
         res.status(201).json(result.ops[0])
       })
     })
