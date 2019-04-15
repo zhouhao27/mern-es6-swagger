@@ -9,6 +9,20 @@ const router = express.Router()
 
 /**
  * @swagger
+ * definitions:
+ *  User:
+ *    type: "object"
+ *    properties:
+ *      email: 
+ *        type: "string"
+ *      password:
+ *        type: "string"
+ *      displayName:
+ *        type: "string"
+ */ 
+
+/**
+ * @swagger
  * /users:
  *    get:
  *      tags:
@@ -36,7 +50,27 @@ router.get('/', (req, res) => {
  *    post:
  *      tags:
  *      - "users"
- *      summary: Create a user with the passed in JSON of the HTTP body
+ *      summary: "Create a user with the passed in JSON of the HTTP body"
+ *      description: "User register. Email should be unique."
+ *      operationId: "addUser"
+ *      consumes:
+ *      - "application/json"
+ *      produces:
+ *      - "application/json"
+ *      parameters:
+ *      - in: "body"
+ *        name: "body"
+ *        description: "User object that needs to be added. Include email,password and display name"
+ *        required: true
+ *        schema:
+ *          $ref: "#/definitions/User"
+ *      responses:
+ *        405:
+ *          description: "Email account already registered."
+ *        406:
+ *          description: "Validation error"
+ *        200:
+ *          description: "successful operation"
  */
 router.post('/', (req, res, next) => {
   // Password must be 7 to 15 characters in length and contain at least one 
@@ -48,11 +82,13 @@ router.post('/', (req, res, next) => {
   }
   joi.validate(req.body, schema, (err, value) => {
     if (err) {
-      return next(new Error('Invalid field: display name 3 to 50 alphanumeric, valid email and password 7 to 15 (one number, one special character)'))
+      const error = new Error('Invalid field: display name 3 to 50 alphanumeric, valid email and password 7 to 15 (one number, one special character)')
+      error.status = 406
+      return next(error)
     }  
   })
 
-  req.body.collection.findOne({
+  req.db.collection.findOne({
     type:'USER_TYPE',
     email:req.body.email
   }, (err, doc) => {
@@ -61,7 +97,9 @@ router.post('/', (req, res, next) => {
     }
 
     if (doc) {
-      return next(new Error('Email account already registered'))
+      const error = new Error('Email account already registered')
+      error.status = 405
+      return next(error)
     }
 
     const xferUser = {

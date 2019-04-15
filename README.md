@@ -47,4 +47,6 @@ MAX_FILTER_STORIES=15
 
 ## TODO
 
-Make strings as constants
+- Make strings as constants
+- Error code as constants
+

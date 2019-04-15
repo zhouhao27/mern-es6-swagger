@@ -119,7 +119,8 @@ const client = new MongoClient(app.get('uri'), { useNewUrlParser: true })
 db.client = client
 client.connect(err => {
   assert.equal(null,err)
-  const collection = db.client.db("newswatcherdb").collection("newswatcherdb");
+  db.collection = db.client.db("newswatcherdb").collection("newswatcher")
+  // console.log(db.collection)
 });
 
 app.set('port', process.env.PORT)
