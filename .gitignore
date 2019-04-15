@@ -1,0 +1,29 @@
+# OS X
+.DS_Store*
+Icon?
+._*
+
+# For security reason, don't commit .env file
+.env
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+*~
+
+# npm
+node_modules
+package-lock.json
+yarn.lock
+*.log
+*.gz
+
+# Coveralls
+coverage
+
+# Benchmarking
+benchmarks/graphs
