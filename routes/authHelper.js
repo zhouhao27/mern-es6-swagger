@@ -5,6 +5,7 @@ import jwt from 'jwt-simple'
 // signed and has not been tampered with
 // If no header token is present, maybe the user
 // The JWT Simple package will throw exceptions
+/*
 module.exports.checkAuth = function(req,res,next) {
   // TODO: nothing inside req.headers['x-auth']
   if (req.headers['x-auth']) {
@@ -22,8 +23,9 @@ module.exports.checkAuth = function(req,res,next) {
     return next(new Error('User is not logged in.'))
   }
 }
-/*
-export default function(req,res,next) {
+*/
+
+function checkAuth(req,res,next) {  
   if (req.headers['x-auth']) {
     try {
       req.auth = jwt.decode(req.headers['x-auth'], process.env.JWT_SECRET)
@@ -38,4 +40,6 @@ export default function(req,res,next) {
   } else {
     return next(new Error('User is not logged in.'))
   }
-} */
+}
+
+export default { checkAuth }
