@@ -165,6 +165,8 @@ router.post('/', (req, res, next) => {
  *            type: integer
  *          required: true
  *          description: Numeric ID of the user to get
+ *      security:
+ *      - jwt: []
  *      responses:
  *        407:
  *          description: "Invalid user id"
