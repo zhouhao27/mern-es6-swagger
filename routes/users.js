@@ -7,91 +7,6 @@ const ObjectId = require('mongodb').ObjectID
 
 const router = express.Router()
 
-/**
- * @swagger
- * definitions:
- *  Register:
- *    type: "object"
- *    properties:
- *      email: 
- *        type: "string"
- *      password:
- *        type: "string"
- *      displayName:
- *        type: "string"
- */ 
-
-/**
- * @swagger
- * definitions:
- *  Settings:
- *    type: "object"
- *    properties:
- *      requireWIFI: 
- *        type: boolean
- *        default: true
- *      enableAlerts:
- *        type: boolean
- *        default: false
- */ 
-
-/**
- * @swagger
- * definitions:
- *  Filter:
- *    type: "object"
- *    properties:
- *      name: 
- *        type: string
- *      keyWords:
- *        type: array
- *        items:
- *          type: string
- *      enableAlert:
- *        type: boolean
- *        default: false
- *      alertFrequency:
- *        type: "integer"
- *        format: "int32"
- *      enableAutoDelete:
- *        type: boolean
- *        default: false
- *      deleteTime:
- *        type: integer
- *        format: int32
- *      timeOfLastScan:
- *        type: integer
- *        format: int32
- *      newsStories:
- *        type: array
- *        items:
- *          type: string 
- */ 
-
-/**
- * @swagger
- * definitions:
- *  User:
- *    type: "object"
- *    properties:
- *      "type":
- *         type: string
- *      displayName:
- *         type: string
- *      email:
- *         type: string
- *      settings:
- *         $ref: '#/definitions/Settings'
- *      savedStories:
- *        type: array
- *        items:
- *          type: string
- *      filters:
- *          type: array
- *          items:
- *            $ref: "#/definitions/Filter"
- */ 
-
  /**
  * @swagger
  * /users:
@@ -158,66 +73,66 @@ router.post('/', (req, res, next) => {
       const error = new Error('Invalid field: display name 3 to 50 alphanumeric, valid email and password 7 to 15 (one number, one special character)')
       error.status = 406
       return next(error)
-    }  
-  })
-
-  req.app.db.collection.findOne({
-    type:'USER_TYPE',
-    email:req.body.email
-  }, (err, doc) => {
-    if (err) {      
-      return next(err)
-    }
-
-    if (doc) {
-      const error = new Error('Email account already registered')
-      error.status = 405
-      return next(error)
-    }
-
-    const xferUser = {
-      type:'USER_TYPE',
-      displayName:req.body.displayName,
-      email:req.body.email,
-      passwordHash:null,
-      date:Date.now(),
-      complete:false,
-      settings: {
-        requireWIFI:true,
-        enableAlerts:false
-      },
-      newsFilters:[{
-        name:'Technology Companies',
-        keyWords:['Apple','Microsoft','IBM','Amazon','Google','Intel'],
-        enableAlert:false,
-        alertFrequency:0,
-        enableAutoDelete:false,
-        deleteTime:0,
-        timeOfLastScan:0,
-        newsStories:[]
-      }],
-      savedStories:[]
-    }
-
-    bcrypt.hash(req.body.password,10, (err, hash) => {
-      if (err) {
-        return next(err)
-      }
-
-      xferUser.passwordHash = hash
-      req.app.db.collection.insertOne(xferUser, (err, result) => {
-        if (err) {
+    } else {
+      req.app.db.collection.findOne({
+        type:'USER_TYPE',
+        email:req.body.email
+      }, (err, doc) => {
+        if (err) {      
           return next(err)
         }
-
-        // TODO:
-        // req.node2.send({
-        //   msg: 'REFERSH_STORIES',
-        //   doc: result.ops[0]
-        // })
-        res.status(201).json(result.ops[0])
+    
+        if (doc) {
+          const error = new Error('Email account already registered')
+          error.status = 405
+          return next(error)
+        }
+    
+        const xferUser = {
+          type:'USER_TYPE',
+          displayName:req.body.displayName,
+          email:req.body.email,
+          passwordHash:null,
+          date:Date.now(),
+          complete:false,
+          settings: {
+            requireWIFI:true,
+            enableAlerts:false
+          },
+          newsFilters:[{
+            name:'Technology Companies',
+            keyWords:['Apple','Microsoft','IBM','Amazon','Google','Intel'],
+            enableAlert:false,
+            alertFrequency:0,
+            enableAutoDelete:false,
+            deleteTime:0,
+            timeOfLastScan:0,
+            newsStories:[]
+          }],
+          savedStories:[]
+        }
+    
+        bcrypt.hash(req.body.password,10, (err, hash) => {
+          if (err) {
+            return next(err)
+          }
+    
+          xferUser.passwordHash = hash
+          req.app.db.collection.insertOne(xferUser, (err, result) => {
+            if (err) {
+              return next(err)
+            }
+    
+            // TODO:
+            // req.node2.send({
+            //   msg: 'REFERSH_STORIES',
+            //   doc: result.ops[0]
+            // })
+            res.status(201).json(result.ops[0])
+          })
+        })
       })
-    })
+    }
   })
 })
 

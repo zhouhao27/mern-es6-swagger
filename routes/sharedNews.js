@@ -6,33 +6,6 @@ const router = express.Router()
 
 /**
  * @swagger
- * definitions:
- *  Story:
- *    type: "object"
- *    properties:
- *      contentSnippet: 
- *        type: "string"
- *      date:
- *        type: "string"
- *        format: "date-time"
- *      hours:
- *        type: "string"
- *      imageUrl:
- *        type: "string"
- *      keep:
- *        type: boolean
- *      link:
- *        type: string
- *      source:
- *        type: string
- *      storyID:
- *        type: string
- *      title:
- *        type: string
- */ 
-
-/**
- * @swagger
  * /sharednews:
  *    get:
  *      tags:
