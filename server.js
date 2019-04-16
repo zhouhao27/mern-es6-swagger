@@ -62,21 +62,25 @@ app.use(bodyParser.json({'limit':'100kb'}))
 import { MongoClient } from 'mongodb'
 
 let db = {}
-app.set('uri', process.env.MONGODB_CONNECT_URL)
+if (process.env.NODE_ENV !== 'production') {
+  app.set('uri', process.env.LOCAL_MONGODB_CONNECT_URL)
+} else {
+  app.set('uri', process.env.MONGODB_CONNECT_URL)
+}
 
 const client = new MongoClient(app.get('uri'), { useNewUrlParser: true })
 db.client = client
 client.connect(err => {
   assert.equal(null,err)
   db.collection = db.client.db("newswatcherdb").collection("newswatcher")
-  console.log("Connected to MongoDB server")
+  console.log(`Connected to MongoDB server at ${app.get('uri')}`)
 })
 
 // routes
 app.get('/', (req,res) => {
   console.log("Home")
-  res.sendFile(path.join(__dirname, 'build', 'index.html'))
-  // res.send("Welcome")
+  // res.sendFile(path.join(__dirname, 'build', 'index.html'))
+  res.send("Home")
 })
 
 // Rest API routes

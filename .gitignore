@@ -22,8 +22,6 @@ yarn.lock
 *.log
 *.gz
 
-# Coveralls
-coverage
-
-# Benchmarking
-benchmarks/graphs
+# Local DB
+local_db
+ 

@@ -6,7 +6,8 @@
   "license": "MIT",
   "scripts": {
     "start": "nodemon ./dist/server.js",
-    "dev": "nodemon --exec babel-node server.js",
+    "run-db": "mongod --dbpath ./local_db",
+    "dev":  "nodemon --exec babel-node server.js",
     "clean": "rimraf dist",
     "build": "babel ./src --out-dir dist"
   },
