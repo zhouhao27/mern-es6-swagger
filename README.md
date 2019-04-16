@@ -1,5 +1,7 @@
 # MERN ES6 Swagger
 
+Please refer to [Full-Stack Node.js MERN with the AWS Platform (2nd edition)](https://github.com/eljamaki01/NewsWatcher2RWeb).
+
 ## Features
 
 - Mongodb
