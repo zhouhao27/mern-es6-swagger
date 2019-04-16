@@ -14,4 +14,4 @@ router.get('/', (req, res) => {
   res.send('Get all the homepage news stories')
 })
 
-module.exports = router
+export default router

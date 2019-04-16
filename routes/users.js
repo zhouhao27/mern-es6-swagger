@@ -213,38 +213,80 @@ router.delete('/:id', authHelper.checkAuth, (req, res) => {
  *            type: integer
  *          required: true
  *          description: Numeric ID of the user to get
+ *      security:
+ *      - jwt: [] 
  *      responses:
  *        407:
  *          description: "Invalid user id"
  *        201:
  *          description: "successful operation"  
  */
-router.get('/:id', (req, res) => {
+router.get('/:id', authHelper.checkAuth, (req, res) => {
   res.send('Return the JSON of a single specified user')
 })
 
 /**
  * @swagger
- * /users/:id:
+ * /users/{userId}:
  *    put:
  *      tags:
  *      - "users"
  *      summary: Replace a user with the passed-in JSON of the HTTP body
+ *      operationId: "changeUser"
+ *      produces:
+ *      - "application/json"
+ *      parameters:
+ *        - in: path
+ *          name: userId
+ *          schema:
+ *            type: integer
+ *          required: true
+ *          description: Numeric ID of the user to get
+ *      security:
+ *      - jwt: [] 
+ *      responses:
+ *        407:
+ *          description: "Invalid user id"
+ *        201:
+ *          description: "successful operation"   
  */
-router.put('/:id', (req, res) => {
+router.put('/:id', authHelper.checkAuth, (req, res) => {
   res.send('Replace a user with the passed-in JSON of the HTTP body')
 })
 
 /**
  * @swagger
- * /users/:id:
+ * /users/{userId}/savedstories/{storyId}:
  *    delete:
  *      tags:
  *      - "users"
  *      summary: Delete a story that the user had previously saved
+ *      operationId: "deleteStory"
+ *      produces:
+ *      - "application/json"
+ *      parameters:
+ *        - in: path
+ *          name: userId
+ *          schema:
+ *            type: integer
+ *          required: true
+ *          description: Numeric ID of the user to get
+ *        - in: path
+ *          name: storyId
+ *          schema:
+ *            type: integer
+ *          required: true
+ *          description: Numeric ID of the story
+ *      security:
+ *      - jwt: [] 
+ *      responses:
+ *        407:
+ *          description: "Invalid user id"
+ *        201:
+ *          description: "successful operation"   
  */
-router.delete('/:id/savedstories/:sid', (req, res) => {
+router.delete('/:id/savedstories/:sid', authHelper.checkAuth, (req, res) => {
   res.send('Delete a story that the user had previously saved')
 })
 
-module.exports = router
+export default router

@@ -29,4 +29,4 @@ router.post('/:sid/comments', (req, res) => {
   res.send('Add a comment to a specified shared news story')
 })
 
-module.exports = router
+export default router

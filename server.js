@@ -9,6 +9,10 @@ import helmet from 'helmet'
 import RateLimit from 'express-rate-limit'
 import csp from 'helmet-csp'
 import swagger from './swagger'
+import users from './routes/users'
+import session from './routes/session'
+import sharedNews from './routes/sharedNews'
+import homeNews from './routes/homeNews'
 
 const app = express()
 // don't use load balancer IP, use actual machine IP instead
@@ -18,11 +22,6 @@ app.enable('trust proxy')
 if (process.env.NODE_ENV !== 'production') {
   require('dotenv').config()
 }
-
-const users = require('./routes/users')
-const session = require('./routes/session')
-const sharedNews = require('./routes/sharedNews')
-const homeNews = require('./routes/homeNews')
 
 // enable document autogeneration
 swagger(app)
