@@ -6,6 +6,7 @@ import jwt from 'jwt-simple'
 // If no header token is present, maybe the user
 // The JWT Simple package will throw exceptions
 module.exports.checkAuth = function(req,res,next) {
+  // TODO: nothing inside req.headers['x-auth']
   if (req.headers['x-auth']) {
     try {
       req.auth = jwt.decode(req.headers['x-auth'], process.env.JWT_SECRET)

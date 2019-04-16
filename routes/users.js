@@ -10,7 +10,7 @@ const router = express.Router()
 /**
  * @swagger
  * definitions:
- *  User:
+ *  Register:
  *    type: "object"
  *    properties:
  *      email: 
@@ -52,7 +52,7 @@ router.get('/', (req, res) => {
  *      - "users"
  *      summary: "Create a user with the passed in JSON of the HTTP body"
  *      description: "User register. Email should be unique."
- *      operationId: "addUser"
+ *      operationId: "register"
  *      consumes:
  *      - "application/json"
  *      produces:
@@ -63,7 +63,7 @@ router.get('/', (req, res) => {
  *        description: "User object that needs to be added. Include email,password and display name"
  *        required: true
  *        schema:
- *          $ref: "#/definitions/User"
+ *          $ref: "#/definitions/Register"
  *      responses:
  *        405:
  *          description: "Email account already registered."
@@ -150,23 +150,72 @@ router.post('/', (req, res, next) => {
 
 /**
  * @swagger
- * /users:
+ * /users/{userId}:
  *    delete:
  *      tags:
  *      - "users" 
  *      summary: Delete a single specified user
+ *      operationId: "deleteUser"
+ *      produces:
+ *      - "application/json"
+ *      parameters:
+ *        - in: path
+ *          name: userId
+ *          schema:
+ *            type: integer
+ *          required: true
+ *          description: Numeric ID of the user to get
+ *      responses:
+ *        407:
+ *          description: "Invalid user id"
+ *        201:
+ *          description: "successful operation"
  */
-router.delete('/:id', (req, res) => {
-  res.send('Delete a single specified user')
+router.delete('/:id', authHelper.checkAuth, (req, res) => {
+  // Verfiy that the passed in id to delete is the same as that in the auth token
+  if (req.params.id != req.auth.userId)
+    return next(new Error('Invalid request for account deletion'))
+
+  // MongoDB should do the work of queing this up and retrying if there is a conflict,
+  // According to their documentation.
+  // This requires a write lock on their part.
+  req.app.db.collection.findOneAndDelete({
+    type: 'USER_TYPE',
+    _id: ObjectId(req.auth.userId)
+  }, (err, result) => {
+    if (err) {
+      console.log('Possible User deleteion contention? err:', err)
+      return next(err)
+    } else if (result.ok != 1) {
+      console.log('Possible User deletetion error? result:', result)
+      return next(new Error('Account deletion failure'))         
+    }
+    res.status(200).json({msg:'User Deleted'})
+  })  
 })
 
 /**
  * @swagger
- * /users/:id:
+ * /users/{userId}:
  *    get:
  *      tags:
  *      - "users"
  *      summary: Return the JSON of a single specified user
+ *      operationId: "getUser"
+ *      produces:
+ *      - "application/json"
+ *      parameters:
+ *        - in: path
+ *          name: userId
+ *          schema:
+ *            type: integer
+ *          required: true
+ *          description: Numeric ID of the user to get
+ *      responses:
+ *        407:
+ *          description: "Invalid user id"
+ *        201:
+ *          description: "successful operation"  
  */
 router.get('/:id', (req, res) => {
   res.send('Return the JSON of a single specified user')

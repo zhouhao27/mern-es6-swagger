@@ -11,12 +11,47 @@ router.get('/', (req, res) => {
   res.send('Session')
 })
 
-// Create a login session token
-// Create a security token as the user logs in that can be passed to the
-// client and used on subsequence calls
-// The user email and password are sent in the body of the request
+/**
+ * @swagger
+ * definitions:
+ *   Login:
+ *     type: "object"
+ *     properties:
+ *       email: 
+ *         type: "string"
+ *       password:
+ *         type: "string"
+ */ 
+
+/**
+ * @swagger
+ * /sessions:
+ *    post:
+ *      tags:
+ *      - "sessions"
+ *      summary: User login
+ *      description: "Create a login session token Create a security token as the user logs in that can be passed to the
+ *      client and used on subsequence calls. The user email and password are sent in the body of the request"
+ *      operationId: "login"
+ *      produces:
+ *      - "application/json"
+ *      parameters:
+ *      - in: "body"
+ *        name: "body"
+ *        description: ""
+ *        required: true
+ *        schema:
+ *          $ref: "#/definitions/Login"
+ *      responses:
+ *        407:
+ *          description: "Email not registered."
+ *        408:
+ *          description: "Wrong password"
+ *        201:
+ *          description: "successful operation"
+ */
 router.post('/', (req,res,next) => {
-  //res.send('Create a login session token')
+  console.log("User logging in...")
   // Password must be 7 to 15 characters in length and
   // contain at least one numeric digit and a special character
   const schema = {
@@ -25,11 +60,13 @@ router.post('/', (req,res,next) => {
   }
   joi.validate(req.body, schema, (err) => {
     if (err) {
-      return next(new Error('Invalid field: password 7 to 15 (one number, one special character)'))
+      const error = new Error('Invalid field: password 7 to 15 (one number, one special character)')
+      error.status = 406
+      return next(error)
     }
   })
 
-  req.db.collection.findOne({
+  req.app.db.collection.findOne({
     type:'USER_TYPE',
     email: req.body.email
   }, (err, user) => {
@@ -38,7 +75,9 @@ router.post('/', (req,res,next) => {
     } 
 
     if (!user) {
-      return next(new Error('User was not found.'))
+      const error = new Error('User was not found.')
+      error.status = 407
+      return next(error)
     }
 
     bcrypt.compare(req.body.password, user.passwordHash, (err, match) => {
@@ -61,23 +100,49 @@ router.post('/', (req,res,next) => {
           return next(err)
         }
       } else {
-        return next(new Error('Wrong password'))
+        const error = new Error('Wrong password')
+        error.status = 408
+        return next(error)
       }
     })
   })
 })
 
-// Delete a login session token
-// Delete the token as a user logs out
+/**
+ * @swagger
+ * /sessions/{userId}:
+ *    delete:
+ *      tags:
+ *      - "sessions"
+ *      summary: Delete a login session token
+ *      description: "Delete the token as a user logs out"
+ *      operationId: "logout"
+ *      produces:
+ *      - "application/json"
+ *      parameters:
+ *        - in: path
+ *          name: userId
+ *          schema:
+ *            type: integer
+ *          required: true
+ *          description: Numeric ID of the user to get
+ *      responses:
+ *        407:
+ *          description: "Invalid user id"
+ *        201:
+ *          description: "successful operation"
+ */
 router.delete('/:id', authHelper.checkAuth, (req,res,next) => {
+  console.log("Logging out...")  
   // Verify the passed in id is the same as that in the auth token
   if (req.params.id != req.auth.userId) {
-    return next(new Error('Invalid request for logout'))
-    res.status(200).json({
-      msg: 'Logged out'
-    })
+    const error = new Error('Invalid request for logout')
+    error.status = 407
+    return next(error)
   }
-  res.send('Delete a login session token')
+  res.status(200).json({
+    msg: 'Logged out'
+  })    
 })
 
 module.exports = router
