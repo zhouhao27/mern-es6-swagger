@@ -11,6 +11,8 @@ const router = express.Router()
  *      tags:
  *      - "sharedNews"
  *      description: Get all of the shared news stories
+ *      security:
+ *      - jwt: []    
  *      responses:
  *        201:
  *          description: "successful operation"    
@@ -103,14 +105,116 @@ router.post('/', authHelper.checkAuth, (req, res, next) => {
   })
 })
 
-// Get all of the shared news stories
-router.delete('/:id', (req, res) => {
-  res.send('Get all of the shared news stories')
+/**
+ * @swagger
+ * /sharednews/{storyId}:
+ *    delete:
+ *      tags:
+ *      - "sharedNews"
+ *      summary: Delete a shared news stories
+ *      operationId: "deleteStory"
+ *      produces:
+ *      - "application/json"
+ *      parameters:
+ *        - in: path
+ *          name: storyId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: Numeric ID of the story
+ *      security:
+ *      - jwt: [] 
+ *      responses:
+ *        407:
+ *          description: "Invalid user id"
+ *        201:
+ *          description: "successful operation"   
+ */
+router.delete('/:sid', authHelper.checkAuth, (req, res, next) => {
+  req.app.db.collection.findOneAndDelete({ 
+    type: 'SHAREDSTORY_TYPE',
+    _id: req.params.sid
+  }, (err, result) => {
+    if (err) {
+      console.log("+++POSSIBLE CONTENTION ERROR?+++ err:", err)
+      return next(err)
+    } else if (result.ok != 1) {
+      console.log("+++POSSIBLE CONTENTION ERROR?+++ result:", result)
+      return next(new Error('Shared story deletion failure'))
+    }
+    res.status(201).json({msg:'Shared story deleted'})
+  })
 })
 
-// Add a comment to a specified shared news story
-router.post('/:sid/comments', (req, res) => {
-  res.send('Add a comment to a specified shared news story')
+/**
+ * @swagger
+ * /sharednews/{storyId}/comments:
+ *    post:
+ *      tags:
+ *      - "sharedNews"
+ *      summary: Add a comment to a specified shared news story
+ *      operationId: "addComment"
+ *      produces:
+ *      - "application/json"
+ *      parameters:
+ *        - in: path
+ *          name: storyId
+ *          schema:
+ *            type: string
+ *          required: true
+ *          description: ID of the story
+ *        - in: "body"
+ *          name: "body"
+ *          description: "Comment string"
+ *          required: true
+ *          schema:
+*             $ref: "#/definitions/Comment"
+ *      security:
+ *      - jwt: [] 
+ *      responses:
+ *        407:
+ *          description: "Invalid user id"
+ *        201:
+ *          description: "successful operation"   
+ */
+router.post('/:sid/comments', authHelper.checkAuth, (req, res, next) => {
+  // Validate the body
+  const schema = {
+    comment: joi.string().max(250).required()
+  }
+
+  joi.validate(req.body, schema, (err) => {
+    if (err) return next(err)
+
+    const xferComment = {
+      displayName: req.auth.displayName,
+      userId: req.auth.userId,
+      dateTime: Date.now(),
+      comment: req.body.comment.substring(0,250)
+    }
+
+    // Not allowed at free tier!!! req.app.db.collection.findOneAndUpdate({
+    //  type: 'SHAREDSTORY_TYPE',
+    //  _id: req.params.sid, 
+    //  $where: 'this.comments.length < 29'
+    //})
+    req.app.db.collection.findOneAndUpdate({
+      type: 'SHAREDSTORY_TYPE',
+      _id: req.params.sid
+    }, { $push: { comments: xferComment }},
+    (err, result) => {
+      if (result && result.value == null) {
+        return next(new Error('Comment limit reached'))  
+      } else if (err) {
+        console.log("+++POSSIBLE CONTENTION ERROR?+++ err:", err)
+        return next(err)  
+      } else if ( result.ok != 1 ) {
+        console.log("+++POSSIBLE CONTENTION ERROR?+++ result:", result)
+        return next(new Error('Comment save failure'))  
+      }
+      res.status(201).json({msg: 'Comment added' })
+    })
+  })
 })
 
 export default router

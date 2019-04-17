@@ -109,3 +109,15 @@
  *          items:
  *            $ref: "#/definitions/Filter"
  */ 
+
+ // TODO: maxLength not working
+/**
+ * @swagger
+ * definitions:
+ *  Comment:
+ *    type: "object"
+ *    properties:
+ *      comment:
+ *        type: string
+ *        maxLength: 250
+ */ 
