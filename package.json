@@ -10,7 +10,8 @@
     "dev": "nodemon --exec babel-node server.js",
     "clean": "rimraf dist",
     "build": "babel ./src --out-dir dist",
-    "functional_api_test": "mocha --timeout 30000 test/functional_api_crud.js --require @babel/register"
+    "functional_api_test": "mocha --timeout 30000 test/functional_api_crud.js --require @babel/register",
+    "test": "mocha --timeout 30000 test/test.js --require @babel/register"
   },
   "dependencies": {
     "@babel/register": "^7.4.0",
