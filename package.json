@@ -7,11 +7,13 @@
   "scripts": {
     "start": "nodemon ./dist/server.js",
     "run-db": "mongod --dbpath ./local_db",
-    "dev":  "nodemon --exec babel-node server.js",
+    "dev": "nodemon --exec babel-node server.js",
     "clean": "rimraf dist",
-    "build": "babel ./src --out-dir dist"
+    "build": "babel ./src --out-dir dist",
+    "functional_api_test": "mocha --timeout 30000 test/functional_api_crud.js --require @babel/register"
   },
   "dependencies": {
+    "@babel/register": "^7.4.0",
     "async": "^2.6.2",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
