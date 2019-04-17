@@ -3,6 +3,8 @@ import bcrypt from 'bcryptjs'
 import async from 'async'
 import joi from 'joi'
 import authHelper from './authHelper'
+import Constants from '../constants'
+
 const ObjectId = require('mongodb').ObjectID
 
 const router = express.Router()
@@ -123,11 +125,10 @@ router.post('/', (req, res, next) => {
               return next(err)
             }
     
-            // TODO:
-            // req.node2.send({
-            //   msg: 'REFERSH_STORIES',
-            //   doc: result.ops[0]
-            // })
+            req.node2.send({
+              msg: Constants.MSG_FRESH_STORIES,
+              doc: result.ops[0]
+            })
             res.status(201).json(result.ops[0])
           })
         })
@@ -344,10 +345,9 @@ router.put('/:id', authHelper.checkAuth, (req, res, next) => {
           console.log("+++POSSIBLE CONTENTION ERROR?+++ result:", result)
           return next(new Error('User PUT failure'))
         }
-
-        // TODO: send to node2
+        
         req.app.node2.send({
-          msg:'REFERSH_STORIES',
+          msg:'REFRESH_STORIES',
           doc: result.value
         })
         res.status(200).json(result.value)
