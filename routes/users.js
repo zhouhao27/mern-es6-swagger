@@ -162,7 +162,7 @@ router.post('/', (req, res, next) => {
  *        201:
  *          description: "successful operation"
  */
-router.delete('/:id', authHelper.checkAuth, (req, res) => {
+router.delete('/:id', authHelper.checkAuth, (req, res, next) => {
   // Verfiy that the passed in id to delete is the same as that in the auth token
   if (req.params.id != req.auth.userId)
     return next(new Error('Invalid request for account deletion'))

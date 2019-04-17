@@ -13,7 +13,7 @@ const options = {
     basePath: '/api/',
     securityDefinitions: {
 			jwt: {
-				description: 'Standard Authorization header using the Bearer scheme. Example: \"{token}\". No need to add prefix like "bearer"!',
+				description: 'Standard Authorization header using the Bearer scheme. Example: "{token}". No need to add prefix like "bearer"!',
 				type: 'apiKey',
 				in: 'header',
 				name: 'x-auth'
