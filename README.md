@@ -42,11 +42,17 @@ MAX_FILTER_STORIES=15
 
 ### Run Mongodb first
 
-> yarn run-db
+`yarn run-db`
 
 ### Run in development mode
 
-> yarn dev
+`yarn dev`
+
+## Notice
+
+> The eslint version in root may affect the react web so I change the version in package.json to 5.12.0
+
+`"eslint": "5.12.0",`
 
 ## Reference
 
@@ -62,11 +68,11 @@ MAX_FILTER_STORIES=15
 
 ### Show process using certain port
 
-> lsof -nP -i4TCP:27017 | grep LISTEN
+`lsof -nP -i4TCP:27017 | grep LISTEN`
 
 ### Kill process by name
 
-> pkill "mongod"
+`pkill "mongod"`
 
 ## TODO
 
