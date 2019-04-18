@@ -50,7 +50,7 @@ MAX_FILTER_STORIES=15
 
 ## Notice
 
-> The eslint version in root may affect the react web so I change the version in package.json to 5.12.0
+> The different eslint version in root may affect the react web so I change the version in package.json to 5.12.0
 
 `"eslint": "5.12.0",`
 
